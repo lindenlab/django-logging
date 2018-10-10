@@ -9,8 +9,10 @@ class DjangoLoggingSettings(object):
         user_settings = getattr(django_settings, 'DJANGO_LOGGING', None)
         self.__settings = dict(
             DEBUG=django_settings.DEBUG,
+            FILE_INFO_LOG=True,
             CONSOLE_LOG=True,
             SQL_LOG=True,
+            SQL_CONSOLE_LOG=True,
             SQL_THRESHOLD=0.5,
             LOG_LEVEL='debug' if django_settings.DEBUG else 'info',
             DISABLE_EXISTING_LOGGERS=True,
@@ -43,7 +45,7 @@ class DjangoLoggingSettings(object):
             self.__settings['CONTENT_TYPES'] = self.CONTENT_TYPES or []
             self.__settings['CONTENT_TYPES'].append('application/json')
 
-        if self.SQL_LOG:
+        if self.SQL_LOG or self.SQL_CONSOLE_LOG:
             self.setup_sql_logging()
 
     def setup_sql_logging(self):

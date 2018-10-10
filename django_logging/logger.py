@@ -4,11 +4,15 @@ import os
 
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
+
 from . import settings
 
 LOG_LEVEL = settings.LOG_LEVEL.upper()
-LOG_HANDLERS = ['default']
+LOG_HANDLERS = []
 
+if settings.INFO_FILE_LOG:
+    LOG_HANDLERS.append['default']
 if settings.CONSOLE_LOG:
     LOG_HANDLERS.append('console')
 if settings.DEBUG:
@@ -16,7 +20,10 @@ if settings.DEBUG:
 if settings.SQL_LOG:
     LOG_HANDLERS.append('sql')
 
-if not os.path.exists(settings.LOG_PATH):
+if not LOG_HANDLERS:
+    raise ImproperlyConfigured("At least one LOG_HANDLER must be enabled")
+
+if not os.path.exists(settings.LOG_PATH) and (settings.INFO_FILE_LOG or settings.DEBUG or settings.SQL_LOG):
     try:
         os.makedirs(settings.LOG_PATH)
     except Exception as e:

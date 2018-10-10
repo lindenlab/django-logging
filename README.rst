@@ -149,6 +149,8 @@ To override Django Logging settings, add a dictionary in your project's settings
 Default Settings
 ----------------
 
+:python:`FILE_INFO_LOG = True` - Log to the default log file.
+
 :python:`CONSOLE_LOG = True` - Log to console.
 
 :python:`SQL_LOG = True` - Log SQL queries.
@@ -200,7 +202,7 @@ Change Log
 - bug fixes
 
 1.10 [2017-11-02]
-----------------
+-----------------
 - adds a 0.5 threshold for SQL queries to be logged. Spamming the logs with fast queries is unnecessary
 
 1.9 [2017-10-26]
