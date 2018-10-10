@@ -173,7 +173,7 @@ Default Settings
 
 :python:`ROTATE_COUNT = 10` - Maximum number of rotated log files.
 
-:python:`INDENT_CONSOLE_LOG = 2` - Indent console log by "n" spaces.
+:python:`INDENT_CONSOLE_LOG = 2` - Indent console log by "n" spaces. None will disable line breaks in json emitted to console entirely.
 
 :python:`ELASTICSEARCH_ENABLED = False` - Set to yes to enable elasticsearch support.
 

@@ -97,6 +97,11 @@ class ConsoleHandler(StreamHandler):
             created = int(record.created)
             message = {record.levelname: {datetime.datetime.fromtimestamp(created).isoformat(): record.msg.to_dict}}
 
+            # disable pretty printing entirely if indent is disabled so that all
+            # of a log message ends up on the same line
+            if settings.INDENT_CONSOLE_LOG is None:
+                return json.dumps(message, sort_keys=True, indent=settings.INDENT_CONSOLE_LOG) 
+
             try:
                 indent = int(settings.INDENT_CONSOLE_LOG)
             except (ValueError, TypeError):
@@ -109,7 +114,7 @@ class ConsoleHandler(StreamHandler):
         elif isinstance(record.msg, dict):
             created = int(record.created)
             message = {record.levelname: {created: record.msg}}
-            return json.dumps(message, sort_keys=True, indent=2)
+            return json.dumps(message, sort_keys=True, indent=settings.INDENT_CONSOLE_LOG)
         else:
             return super(ConsoleHandler, self).format(record)
 
