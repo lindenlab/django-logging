@@ -33,4 +33,4 @@ class CursorLogWrapper(CursorWrapper):
                 self.db.queries_log.append(sql_info)
                 record = SqlLogObject(sql_info)
                 log.info(record)
-            Thread(target=do_log, args=tuple(self.cursor, *args)).start()
+            Thread(target=do_log, args=((self.cursor,) + args)).start()
