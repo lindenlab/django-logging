@@ -29,16 +29,14 @@ class BaseLogObject(object):
                      'HTTP_HOST', 'HTTP_USER_AGENT', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', ' HTTP_X_REQUEST_ID']
         result = dict(
             method=self.request.method,
-            meta={key.lower(): str(value)
-                  for key, value in self.request.META.items() if key in meta_keys},
+            meta={key.lower(): str(value) for key, value in self.request.META.items() if key in meta_keys},
             path=self.request.path_info,
         )
 
         result['scheme'] = getattr(self.request, 'scheme', None)
 
         try:
-            result['data'] = {key: value for key,
-                              value in self.request.data.items()}
+            result['data'] = {key: value for key, value in self.request.data.items()}
         except AttributeError:
             if self.request.method == 'GET':
                 result['data'] = self.request.GET.dict()
@@ -58,8 +56,7 @@ class BaseLogObject(object):
                      'HTTP_HOST', 'HTTP_USER_AGENT', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', ' HTTP_X_REQUEST_ID']
         result = {}
         result["request.method"] = self.request.method
-        result.update({"request.meta." + key.lower(): str(value)
-                       for key, value in self.request.META.items() if key in meta_keys})
+        result.update({"request.meta." + key.lower(): str(value) for key, value in self.request.META.items() if key in meta_keys})
         result["request.path"] = self.request.path_info
         result['request.scheme'] = getattr(self.request, 'scheme', None)
 
@@ -146,10 +143,9 @@ class LogObject(BaseLogObject):
 
     def format_response_flat(self):
         result = {}
-        result["response.status"] = self.response.status_code,
-        result["response.headers"] = dict(self.response.items()),
-        result["reponse.reason"] = getattr(
-            self.response, 'reason_phrase', None),
+        result["response.status"] = self.response.status_code
+        result["response.headers"] = str(self.response.items())
+        result["reponse.reason"] = getattr(self.response, 'reason_phrase', None)
         result["response.charset"] = getattr(self.response, 'charset', None)
 
         if self.matching_content_type(result['headers']):
