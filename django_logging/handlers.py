@@ -93,14 +93,28 @@ class ConsoleHandler(StreamHandler):
         return super(ConsoleHandler, self).emit(record)
 
     def format(self, record):
-        if isinstance(record.msg, LogObject) or isinstance(record.msg, SqlLogObject):
+        if isinstance(record.msg, LogObject) or isinstance(record.msg, SqlLogObject) or isinstance(record.msg, ErrorLogObject):
             created = int(record.created)
-            message = {record.levelname: {datetime.datetime.fromtimestamp(created).isoformat(): record.msg.to_dict}}
+            if settings.FLATTEN_CONSOLE_LOG:
+                # flatten out message so that it has as many keys in the top
+                # level of the dict as possible for logging in kibana, which
+                # does not support nested objects.
+                #
+                # https://www.elastic.co/guide/en/kibana/current/nested-objects.html
+                message = record.msg.to_dict_flat
+                message["level"] = record.levelname
+
+                # This may be unneeded if the formatter already includes a
+                # timestamp.
+                message["timestamp"] = datetime.datetime.fromtimestamp(created).isoformat()
+
+            else:
+                message = {record.levelname: {datetime.datetime.fromtimestamp(created).isoformat(): record.msg.to_dict}}
 
             # disable pretty printing entirely if indent is disabled so that all
             # of a log message ends up on the same line
             if settings.INDENT_CONSOLE_LOG is None:
-                return json.dumps(message, sort_keys=True, indent=settings.INDENT_CONSOLE_LOG) 
+                return json.dumps(message, sort_keys=True, indent=settings.INDENT_CONSOLE_LOG)
 
             try:
                 indent = int(settings.INDENT_CONSOLE_LOG)
@@ -109,8 +123,6 @@ class ConsoleHandler(StreamHandler):
             import pprint
             message = pprint.pformat(message, indent, 160, compact=True)
             return message
-        elif isinstance(record.msg, ErrorLogObject):
-            return str(record.msg)
         elif isinstance(record.msg, dict):
             created = int(record.created)
             message = {record.levelname: {created: record.msg}}
@@ -141,4 +153,3 @@ class SQLFileHandler(RotatingFileHandler):
                 fh_out.writelines(fh_in)
             fh_in.seek(0)
             fh_in.truncate()
-
