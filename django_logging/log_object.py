@@ -62,13 +62,13 @@ class BaseLogObject(object):
 
         # Don't do result["request.data." + key] because user requests will bloat kibana's index
         try:
-            result.data["request.data"] = str(self.request.data.items())
+            result.data["request.data"] = json.dumps(self.request.data, sort_keys=True, indent=None)
 
         except AttributeError:
             if self.request.method == 'GET':
-                result["request.data"] = str(self.request.GET.dict().items())
+                result["request.data.get"] = json.dumps(self.request.GET.dict(), sort_keys=True, indent=None)
             elif self.request.method == 'POST':
-                result["request.data"] = str(self.request.POST.dict().items())
+                result["request.data.post"] = json.dumps(self.request.POST.dict(), sort_keys=True, indent=None)
         try:
             result['request.user'] = str(self.request.user)
         except AttributeError:
@@ -144,8 +144,8 @@ class LogObject(BaseLogObject):
     def format_response_flat(self):
         result = {}
         result["response.status"] = self.response.status_code
-        result["response.headers"] = str(self.response.items())
-        result["reponse.reason"] = getattr(self.response, 'reason_phrase', None)
+        result["response.headers"] = json.dumps(self.response.items(), sort_keys=True, indent=None)
+        result["response.reason"] = getattr(self.response, 'reason_phrase', None)
         result["response.charset"] = getattr(self.response, 'charset', None)
 
         if self.matching_content_type(dict(self.response.items())):
