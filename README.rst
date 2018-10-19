@@ -5,7 +5,7 @@ Django Logging
 ==============
 
 A Django library that logs request, response and exception details in a JSON document.
-It uses the python rotation mechanism to rotate the file logs, but the rotation files will be gziped and it has support for sending the log messages to Elasticsearch.
+It uses the python rotation mechanism to rotate the file logs, but the rotation files will be gzipped.
 
 .. image:: https://badge.fury.io/py/django-logging-json.svg
     :target: https://badge.fury.io/py/django-logging-json
@@ -176,17 +176,6 @@ Default Settings
 :python:`INDENT_CONSOLE_LOG = 2` - Indent console log by "n" spaces. 'None' will disable line breaks in json emitted to console entirely.
 
 :python:`FLATTEN_CONSOLE_LOG = False` - Attempt to flatten the structure of logs going to console to a dictionary of a single level.
-
-:python:`ELASTICSEARCH_ENABLED = False` - Set to yes to enable elasticsearch support.
-
-:python:`ELASTICSEARCH_HOSTS = ["localhost"]` - Elasticsearch hosts
-
-:python:`ELASTICSEARCH_INDEX = "django-logging-json"` - Elasticsearch index name
-
-:python:`ELASTICSEARCH_SSL = False` - Elasticsearch connection via SSL (:443)
-
-:python:`ELASTICSEARCH_AUTH = ('user', 'password)` - Elasticsearch authorization credentials (user, password). Defaults to `None`
-
 
 Change Log
 ==========

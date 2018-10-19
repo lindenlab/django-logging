@@ -50,7 +50,6 @@ setup(
     install_requires=[
         'django>=1.4',
         'six',
-        'elasticsearch>=2.0.0',
         'certifi'
     ]
 )

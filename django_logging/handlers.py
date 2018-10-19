@@ -6,12 +6,8 @@ from logging import StreamHandler, DEBUG
 from logging.handlers import RotatingFileHandler
 from threading import Thread
 
-import certifi
-
 from . import settings
 from .log_object import LogObject, ErrorLogObject, SqlLogObject
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import ConnectionError
 
 
 def message_from_record(record):
@@ -31,39 +27,12 @@ def message_from_record(record):
     return message
 
 
-def send_to_elasticsearch(timestamp, level, message):
-    Thread(target=__send_to_es, args=(timestamp, level, message)).start()
-
-
-def __send_to_es(timestamp, level, message):
-    index = settings.ELASTICSEARCH_INDEX
-    if settings.ELASTICSEARCH_ENABLED:
-        conn = Elasticsearch(hosts=settings.ELASTICSEARCH_HOSTS,
-                             use_ssl=settings.ELASTICSEARCH_SSL,
-                             http_auth=settings.ELASTICSEARCH_AUTH,
-                             verify_certs=settings.ELASTICSEARCH_SSL,
-                             ca_certs=certifi.where())
-        try:
-            message = json.loads(message).get(level).get(str(timestamp))
-            conn.index(
-                index="{}".format(index),
-                doc_type="log_objects",
-                body={
-                    "date": datetime.datetime.fromtimestamp(timestamp).isoformat(),
-                    "level": level,
-                    "message": message
-                })
-        except ConnectionError:
-            pass
-
-
 class DefaultFileHandler(RotatingFileHandler):
     def emit(self, record):
         if isinstance(record.msg, SqlLogObject):
             return
         super(DefaultFileHandler, self).emit(record)
         message = self.format(record)
-        send_to_elasticsearch(int(record.created), record.levelname, message)
 
     def format(self, record):
         created = int(record.created)
@@ -137,7 +106,6 @@ class SQLFileHandler(RotatingFileHandler):
             return
         super(SQLFileHandler, self).emit(record)
         message = self.format(record)
-        send_to_elasticsearch(int(record.created), record.levelname, message)
 
     def format(self, record):
         created = int(record.created)
