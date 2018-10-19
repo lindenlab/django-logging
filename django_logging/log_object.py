@@ -148,7 +148,7 @@ class LogObject(BaseLogObject):
         result["reponse.reason"] = getattr(self.response, 'reason_phrase', None)
         result["response.charset"] = getattr(self.response, 'charset', None)
 
-        if self.matching_content_type(result['headers']):
+        if self.matching_content_type(dict(self.response.items())):
             if settings.CONTENT_JSON_ONLY:
                 try:
                     result['response.content'] = json.loads(self.content)
