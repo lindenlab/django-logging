@@ -15,7 +15,7 @@ if settings.INFO_FILE_LOG:
     LOG_HANDLERS.append['default']
 if settings.CONSOLE_LOG:
     LOG_HANDLERS.append('console')
-if settings.DEBUG:
+if settings.DEBUG_FILE_LOG:
     LOG_HANDLERS.append('debug')
 if settings.SQL_LOG:
     LOG_HANDLERS.append('sql')
@@ -23,7 +23,7 @@ if settings.SQL_LOG:
 if not LOG_HANDLERS:
     raise ImproperlyConfigured("At least one LOG_HANDLER must be enabled")
 
-if not os.path.exists(settings.LOG_PATH) and (settings.INFO_FILE_LOG or settings.DEBUG or settings.SQL_LOG):
+if not os.path.exists(settings.LOG_PATH) and (settings.INFO_FILE_LOG or settings.DEBUG_FILE_LOG or settings.SQL_LOG):
     try:
         os.makedirs(settings.LOG_PATH)
     except Exception as e:
@@ -33,9 +33,9 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': settings.DISABLE_EXISTING_LOGGERS,
     'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
-            },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
     },
     'formatters': {
         'verbose': {
@@ -88,6 +88,10 @@ LOGGING = {
         },
     }
 }
+# Remove handlers that aren't needed so unneeded log files don't get created.
+for handler in list(LOGGING['handlers'].keys()):
+    if handler not in LOG_HANDLERS:
+        del LOGGING['handlers'][handler]
 logging.config.dictConfig(LOGGING)
 
 

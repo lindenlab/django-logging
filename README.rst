@@ -151,6 +151,8 @@ Default Settings
 
 :python:`FILE_INFO_LOG = True` - Log to the default log file.
 
+:python:`FILE_DEBUG_LOG = False` - Log debug information to a separate debug log file.
+
 :python:`CONSOLE_LOG = True` - Log to console.
 
 :python:`SQL_LOG = True` - Log SQL queries.
