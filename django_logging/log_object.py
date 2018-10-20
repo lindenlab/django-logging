@@ -144,7 +144,7 @@ class LogObject(BaseLogObject):
     def format_response_flat(self):
         result = {}
         result["response.status"] = self.response.status_code
-        result["response.headers"] = json.dumps(self.response.items(), sort_keys=True, indent=None)
+        result["response.headers"] = json.dumps(dict(self.response.items()), sort_keys=True, indent=None)
         result["response.reason"] = getattr(self.response, 'reason_phrase', None)
         result["response.charset"] = getattr(self.response, 'charset', None)
 
