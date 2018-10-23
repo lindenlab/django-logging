@@ -1,5 +1,6 @@
 import abc
 import json
+import logging
 import six
 import sys
 import traceback
@@ -190,6 +191,7 @@ class ErrorLogObject(BaseLogObject):
         result.update(self.format_request_flat())
         result.update(ErrorLogObject.format_exception_flat(self.exception))
         result["duration"] = self.duration
+        return result
 
     @classmethod
     def format_traceback(cls, tb):
@@ -215,6 +217,13 @@ class ErrorLogObject(BaseLogObject):
         return result
 
     @classmethod
+    def format_traceback_string(cls, tb):
+        tb = traceback.extract_tb(tb)
+        for i in tb:
+            yield {'file': i[0], 'line': i[1], 'method': i[2]}
+
+
+    @classmethod
     def format_exception_flat(cls, exception):
         result = {}
         result["exception.message"] = str(exception)
@@ -225,7 +234,12 @@ class ErrorLogObject(BaseLogObject):
         else:
             _, _, _traceback = traceback.sys.exc_info()
 
-        result['exception.traceback'] = "\n".join(cls.format_traceback(_traceback))
+        temp_list = []
+        for line in cls.format_traceback(_traceback):
+            temp_list.append(line)
+        # this approach may prove to be so unreadable in practice that it is not worth doing
+        result["exception.traceback"] = json.dumps(temp_list, sort_keys=True, indent=None)
+        return result
 
     @property
     def response(self):

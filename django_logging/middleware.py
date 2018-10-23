@@ -22,6 +22,7 @@ class DjangoLoggingMiddleware(MiddlewareMixin):
             return response
 
         if response.status_code == 500:
+            print("middleware skipping response due to 500")
             return response
         elif 400 <= response.status_code < 500:
             log.warning(LogObject(request, response, duration))
