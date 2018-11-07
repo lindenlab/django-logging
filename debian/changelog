@@ -1,0 +1,5 @@
+python-django-logging-middleware-linden (1.16) unstable; urgency=medium
+
+  * Initial debianization using dh_python.
+
+ -- Logan Dethrow <log@lindenlab.com>  Wed, 24 Oct 2018 21:49:05 +0000

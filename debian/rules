@@ -1,0 +1,13 @@
+#! /usr/bin/make -f
+
+#export DH_VERBOSE = 1
+export PYBUILD_NAME = django-logging-middleware-linden
+# "Tests" currently try to import the module, which fails due to dependency on
+# django configuration values.
+export PYBUILD_DISABLE_python2.7=test
+export PYBUILD_DISABLE_python3.4=test
+export PYBUILD_DISABLE_python3.5=test
+export PYBUILD_DISABLE_python3.6=test
+
+%:
+		dh $@ --with python2,python3 --buildsystem=pybuild

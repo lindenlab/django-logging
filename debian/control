@@ -1,0 +1,38 @@
+Source: python-django-logging-middleware-linden
+Section: python
+Priority: optional
+Maintainer: Log Linden <log@secondlife.com>
+Build-Depends: debhelper (>= 9),
+ dh-python,
+ python-all,
+ python3-all,
+ python-nose,
+ python3-nose,
+ python-setuptools,
+ python3-setuptools
+Standards-Version: 3.9.8 
+X-Python-Version: =2.7
+X-Python3-Version: >=3.4
+Homepage: http://github.com/lindenlab/django_logging
+
+Package: python-django-logging-middleware-linden
+Architecture: any
+Depends: ${python:Depends}, ${misc:depends}
+X-Python-Version: python (>= 2.7)
+Description: Django logging middleware (Python 2)
+ Django logging middleware. Provides custom logging
+ handlers for http requests, http responses, exceptions
+ and sql queries.
+ .
+ This package installs the library for Python 2.
+
+Package: python3-django-logging-middleware-linden
+Architecture: any
+Depends: ${python3:Depends}, ${misc:depends}
+X-Python3-Version: python (>= 3.4)
+Description: Django logging middleware (Python 3)
+ Django logging middleware. Provides custom logging
+ handlers for http requests, http responses, exceptions
+ and sql queries.
+ .
+ This package installs the library for Python 3.

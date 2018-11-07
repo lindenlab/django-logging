@@ -1,2 +1,7 @@
+recursive-include django_logging *
+include __init__.py
 include LICENSE
 include README.rst
+include debian/changelog
+include setup.py
+global-exclude *.pyc
