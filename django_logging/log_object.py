@@ -56,24 +56,24 @@ class BaseLogObject(object):
                      'TZ', 'REMOTE_HOST', 'CONTENT_TYPE', 'CONTENT_LENGTH', 'HTTP_AUTHORIZATION',
                      'HTTP_HOST', 'HTTP_USER_AGENT', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', ' HTTP_X_REQUEST_ID']
         result = {}
-        result["request.method"] = self.request.method
-        result.update({"request.meta." + key.lower(): str(value) for key, value in self.request.META.items() if key in meta_keys})
-        result["request.path"] = self.request.path_info
-        result['request.scheme'] = getattr(self.request, 'scheme', None)
+        result["request_method"] = self.request.method
+        result.update({"request_meta_" + key.lower(): str(value) for key, value in self.request.META.items() if key in meta_keys})
+        result["request_path"] = self.request.path_info
+        result['request_scheme'] = getattr(self.request, 'scheme', None)
 
-        # Don't do result["request.data." + key] because user requests will bloat kibana's index
+        # Don't do result["request_data_" + key] because user requests will bloat kibana's index
         try:
-            result.data["request.data"] = json.dumps(self.request.data, sort_keys=True, indent=None)
+            result.data["request_data"] = json.dumps(self.request.data, sort_keys=True, indent=None)
 
         except AttributeError:
             if self.request.method == 'GET':
-                result["request.data.get"] = json.dumps(self.request.GET.dict(), sort_keys=True, indent=None)
+                result["request_data_get"] = json.dumps(self.request.GET.dict(), sort_keys=True, indent=None)
             elif self.request.method == 'POST':
-                result["request.data.post"] = json.dumps(self.request.POST.dict(), sort_keys=True, indent=None)
+                result["request_data_post"] = json.dumps(self.request.POST.dict(), sort_keys=True, indent=None)
         try:
-            result['request.user'] = str(self.request.user)
+            result['request_user'] = str(self.request.user)
         except AttributeError:
-            result['request.user'] = None
+            result['request_user'] = None
 
         return result
 
@@ -144,25 +144,25 @@ class LogObject(BaseLogObject):
 
     def format_response_flat(self):
         result = {}
-        result["response.status"] = self.response.status_code
-        result["response.headers"] = json.dumps(dict(self.response.items()), sort_keys=True, indent=None)
-        result["response.reason"] = getattr(self.response, 'reason_phrase', None)
-        result["response.charset"] = getattr(self.response, 'charset', None)
+        result["response_status"] = self.response.status_code
+        result["response_headers"] = json.dumps(dict(self.response.items()), sort_keys=True, indent=None)
+        result["response_reason"] = getattr(self.response, 'reason_phrase', None)
+        result["response_charset"] = getattr(self.response, 'charset', None)
 
         if self.matching_content_type(dict(self.response.items())):
             if settings.CONTENT_JSON_ONLY:
                 try:
-                    result['response.content'] = json.loads(self.content)
+                    result['response_content'] = json.loads(self.content)
                 except (ValueError, AttributeError):
                     pass
             else:
                 try:
-                    result['response.content'] = self.content
+                    result['response_content'] = self.content
                 except AttributeError:
                     pass
 
         for field in result.copy().keys():
-            if field.split(".")[-1] not in settings.RESPONSE_FIELDS:
+            if field.split("_")[-1] not in settings.RESPONSE_FIELDS:
                 del result[field]
         return result
 
@@ -222,12 +222,11 @@ class ErrorLogObject(BaseLogObject):
         for i in tb:
             yield {'file': i[0], 'line': i[1], 'method': i[2]}
 
-
     @classmethod
     def format_exception_flat(cls, exception):
         result = {}
-        result["exception.message"] = str(exception)
-        result["exception.type"] = cls.exception_type(exception),
+        result["exception_message"] = str(exception)
+        result["exception_type"] = cls.exception_type(exception),
         if sys.version_info.major >= 3 and sys.version_info.minor >= 5:
             _traceback = traceback.TracebackException.from_exception(
                 exception).exc_traceback
@@ -238,7 +237,7 @@ class ErrorLogObject(BaseLogObject):
         for line in cls.format_traceback(_traceback):
             temp_list.append(line)
         # this approach may prove to be so unreadable in practice that it is not worth doing
-        result["exception.traceback"] = json.dumps(temp_list, sort_keys=True, indent=None)
+        result["exception_traceback"] = json.dumps(temp_list, sort_keys=True, indent=None)
         return result
 
     @property
@@ -280,9 +279,9 @@ class SqlLogObject(object):
     @property
     def to_dict_flat(self):
         result = {}
-        result['sql.duration'] = float(self.query['time'])
-        result['sql.query'] = query = self.query['sql']
+        result['sql_duration'] = float(self.query['time'])
+        result['sql_query'] = query = self.query['sql']
 
         if self.using is not None:
-            result['sql.using'] = self.using
+            result['sql_using'] = self.using
         return result
