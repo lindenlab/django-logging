@@ -77,6 +77,9 @@ class ConsoleHandler(StreamHandler):
                 # timestamp.
                 message["timestamp"] = datetime.datetime.fromtimestamp(created).isoformat()
 
+                # Use "name" to make it easier to filter these out in kibana.
+                message["name"] = "djlogger." + ("error" if isinstance(record.msg, ErrorLogObject) else "sql" if isinstance(record.msg, SqlLogObject) else "log")
+
             else:
                 message = {record.levelname: {datetime.datetime.fromtimestamp(created).isoformat(): record.msg.to_dict}}
 

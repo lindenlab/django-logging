@@ -1,3 +1,9 @@
+python-django-logging-middleware-linden (1.18) unstable; urgency=medium
+
+  * Added "name" field to all flattened log lines.
+
+ -- Logan Dethrow <log@lindenlab.com>  Sat, 10 Nov 2018 00:06:19 +0000
+
 python-django-logging-middleware-linden (1.17) unstable; urgency=medium
 
   * Changed json keys to use "_" instead of "." in flattening process.
